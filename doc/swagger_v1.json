@@ -1,0 +1,265 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "Sample FAQ Engine",
+    "description": "A sample API that provides CRUD and search services for FAQs",
+    "termsOfService": "http://swagger.io/terms/",
+    "contact": {
+      "name": "Javier Moreno Garcia"
+    },
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "host": "localhost:30000",
+  "basePath": "/api/v1",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/topics": {
+      "get": {
+        "description": "Returns all topics in the system",
+        "operationId": "getTopics",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Topics retrieved",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Topic"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/ErrorModel"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Creates a new topic",
+        "operationId": "createTopic",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "topic",
+            "in": "body",
+            "description": "Topic to create",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TopicCriteria"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Topic created",
+            "schema": {
+              "$ref": "#/definitions/Topic"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/ErrorModel"
+            }
+          }
+        }
+      }
+    },
+    "/topics/{id}": {
+      "get": {
+        "description": "Returns a topic by its id",
+        "operationId": "getTopicById",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the topic to retrieve",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Topic retrieved",
+            "schema": {
+              "$ref": "#/definitions/Topic"
+            }
+          },
+          "404": {
+            "description": "Topic not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorModel"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/ErrorModel"
+            }
+          }
+        }
+      },
+      "put": {
+        "description": "Updates a topic by its id",
+        "operationId": "updateById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the topic to update",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "topic",
+            "in": "body",
+            "description": "Topic to update",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TopicCriteria"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Topic updated",
+            "schema": {
+              "$ref": "#/definitions/Topic"
+            }
+          },
+          "404": {
+            "description": "Topic not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorModel"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/ErrorModel"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Deletes a topic by its id",
+        "operationId": "deleteTopicById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the topic to delete",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Topic deleted"
+          },
+          "404": {
+            "description": "Topic not found",
+            "schema": {
+              "$ref": "#/definitions/ErrorModel"
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/ErrorModel"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Topic": {
+      "type": "object",
+      "allOf": [
+        {
+          "required": [
+            "id"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/TopicCriteria"
+        }
+      ]
+    },
+    "TopicCriteria": {
+      "type": "object",
+      "required": [
+        "title",
+        "items"
+      ],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TopicItem"
+          }
+        }
+      }
+    },
+    "TopicItem": {
+      "type": "object",
+      "required": [
+        "question",
+        "answer"
+      ],
+      "properties": {
+        "question": {
+          "type": "string"
+        },
+        "answer": {
+          "type": "string"
+        }
+      }
+    },
+    "ErrorModel": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
