@@ -1,5 +1,8 @@
 const config = require('./config');
 const mongoose = require('mongoose');
+const Q = require('q');
+
+mongoose.Promise = require('q').Promise;
 
 const uri = `mongodb://${config.mongodb.host}:${config.mongodb.port}/${config.mongodb.databaseName}`;
 mongoose.connect(uri);
