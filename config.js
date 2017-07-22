@@ -1,19 +1,65 @@
-const config = {};
+const environment = require('./environment');
+const mongoose = require('mongoose');
+const mongoosastic = require('mongoosastic');
+const elasticsearch = require('elasticsearch');
+const Q = require('q');
 
+//
+// elastic search
 
-config.server = {};
-config.server.port = process.env.WEB_PORT || 30000;
+const elasticSearchClient = new elasticsearch.Client(getElasticSearchConfig());
 
-config.mongodb = {};
-config.mongodb.username = process.env.MONGODB_USERNAME || null;
-config.mongodb.password= process.env.MONGODB_PASSWORD || null;
-config.mongodb.host= process.env.MONGODB_HOST || 'localhost';
-config.mongodb.port = process.env.MONGODB_PORT || 27017;
-config.mongodb.databaseName = process.env.MONGODB_NAME || 'faq';
+//
+// mongodb
 
-config.elasticsearch = {};
-config.elasticsearch.host = process.env.ELASTICSEARCH_HOST || 'localhost';
-config.elasticsearch.port = process.env.ELASTICSEARCH_PORT || 9200;
-config.elasticsearch.log = process.env.ELASTICSEARCH_LOG || 'trace';
+mongoose.Promise = require('q').Promise;
+mongoose.connect(getMongoUri());
 
-module.exports = config;
+const Schema = mongoose.Schema;
+
+const topicSchema = new Schema({
+    title: {type: String, required: true},
+    items: [
+        {
+            question: {type: String, required: true},
+            answer: {type: String, required: true}
+        }
+    ]
+}, {collection: 'topics'});
+
+//
+// link
+
+topicSchema.plugin(mongoosastic, {
+    esClient: elasticSearchClient
+});
+
+const topicRepository = mongoose.model('topic', topicSchema);
+
+//
+// urls
+
+function getMongoUri() {
+    return `mongodb://${environment.mongodb.host}:${environment.mongodb.port}/${environment.mongodb.databaseName}`;
+}
+
+function getElasticSearchConfig() {
+    return {
+        host: environment.elasticsearch.host + ":" + environment.elasticsearch.port,
+        log: environment.elasticsearch.log
+    };
+}
+
+//
+// exports
+
+module.exports = {
+
+    getTopicRepository: function () {
+        return topicRepository;
+    },
+
+    getElasticSearchClient: function () {
+        return elasticSearchClient;
+    }
+};

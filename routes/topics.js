@@ -1,11 +1,8 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const config = require('../config');
 
-const db = require('../db');
-const elasticsearch = require('../elasticsearch');
-
-const topicRepository = mongoose.model('topic', db.getTopicSchema());
-const elasticSearchClient = elasticsearch.getClient();
+const topicRepository = config.getTopicRepository();
+const elasticSearchClient = config.getElasticSearchClient();
 
 //
 // routes
@@ -21,9 +18,9 @@ router.get('/search', (req, res) => {
     elasticSearchClient.search({
         q: term
     }).then(function (body) {
-        res.json(200, body);
+        res.status(200).json(body.hits);
     }).catch(error => {
-        res.json(500, {code: 'GENERIC_ERROR', message: error.message});
+        res.status(500).json({code: 'GENERIC_ERROR', message: error.message});
     })
 });
 
@@ -34,7 +31,7 @@ router.get('/', (req, res) => {
     topicRepository.find().then(doc => {
         res.json(doc);
     }).catch(error => {
-        res.json(500, {code: 'GENERIC_ERROR', message: error.message});
+        res.status(500).json({code: 'GENERIC_ERROR', message: error.message});
     });
 });
 
@@ -52,7 +49,7 @@ router.post('/', (req, res) => {
     itemModel.save().then(doc => {
         res.json(201, doc);
     }).catch(error => {
-        res.json(500, {code: 'GENERIC_ERROR', message: error.message});
+        res.status(500).json({code: 'GENERIC_ERROR', message: error.message});
     });
 });
 
@@ -65,13 +62,13 @@ router.get('/:id', (req, res) => {
     topicRepository.findOne({_id: id}).then(doc => {
 
         if (!doc) {
-            res.json(404, {code: 'TOPIC_NOT_FOUND', message: `Topic with id '${id}' not found`});
+            res.status(404).json({code: 'TOPIC_NOT_FOUND', message: `Topic with id '${id}' not found`});
             return;
         }
 
         res.json(doc);
     }).catch(error => {
-        res.json(500, {code: 'GENERIC_ERROR', message: error.message});
+        res.status(500).json({code: 'GENERIC_ERROR', message: error.message});
     })
 });
 
@@ -89,13 +86,13 @@ router.put('/:id', (req, res) => {
     topicRepository.findOneAndUpdate({_id: id}, topic, {new: true}).then(doc => {
 
         if (!doc) {
-            res.json(404, {code: 'TOPIC_NOT_FOUND', message: `Topic with id '${id}' not found`});
+            res.status(404).json({code: 'TOPIC_NOT_FOUND', message: `Topic with id '${id}' not found`});
             return;
         }
 
         res.json(doc);
     }).catch(error => {
-        res.json(500, {code: 'GENERIC_ERROR', message: error.message});
+        res.status(500).json({code: 'GENERIC_ERROR', message: error.message});
     })
 });
 
@@ -108,13 +105,13 @@ router.delete('/:id', (req, res) => {
     topicRepository.findOneAndRemove({_id: id}).then(doc => {
 
         if (!doc) {
-            res.json(404, {code: 'TOPIC_NOT_FOUND', message: `Topic with id '${id}' not found`});
+            res.status(404).json({code: 'TOPIC_NOT_FOUND', message: `Topic with id '${id}' not found`});
             return;
         }
 
-        res.status(204);
+        res.status(204).json();
     }).catch(error => {
-        res.json(500, {code: 'GENERIC_ERROR', message: error.message});
+        res.status(500).json({code: 'GENERIC_ERROR', message: error.message});
     })
 });
 

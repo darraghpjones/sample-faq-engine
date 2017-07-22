@@ -1,4 +1,4 @@
-const config = require('./config.js');
+const environment = require('./environment.js');
 const express = require('express');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 //
 // express
 
-const app = express(config.server.port);
+const app = express(environment.server.port);
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
@@ -32,7 +32,7 @@ app.use('/api/v1', swaggerUi.serve, swaggerUi.setup(swaggerDocumentV1));
 // catch 404 and forward to error handler
 
 app.use(function (req, res) {
-    res.json(404, {code: 'GENERIC_ERROR', message: "Not found"});
+    res.status(404).json({code: 'GENERIC_ERROR', message: "Not found"});
 });
 
 // error handler
@@ -44,14 +44,14 @@ app.use(function (error, req, res) {
 
     // render the error page
 
-    res.json(error.status || 500, {code: 'GENERIC_ERROR', message: error.message});
+    res.status(error.status || 500).json({code: 'GENERIC_ERROR', message: error.message});
 });
 
 //
 // express (starting server)
 
-app.listen(config.server.port, function () {
-    console.log(`Node server listening on port ${config.server.port}`);
+app.listen(environment.server.port, function () {
+    console.log(`Node server listening on port ${environment.server.port}`);
 });
 
 module.exports = app;

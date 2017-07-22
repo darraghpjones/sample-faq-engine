@@ -83,6 +83,41 @@
         }
       }
     },
+    "/topics/search": {
+      "get": {
+        "description": "Searches for topics and their content",
+        "operationId": "search",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "term",
+            "in": "query",
+            "description": "A term to search for in a topic title or one of his question/ answers",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Topics retrieved",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Topic"
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "schema": {
+              "$ref": "#/definitions/ErrorModel"
+            }
+          }
+        }
+      }
+    },
     "/topics/{id}": {
       "get": {
         "description": "Returns a topic by its id",
